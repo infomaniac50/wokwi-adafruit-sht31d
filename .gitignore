@@ -104,3 +104,4 @@ dkms.conf
 
 .env
 .tools
+*.wasm

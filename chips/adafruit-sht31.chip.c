@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// https://rosettacode.org/wiki/Pseudo-random_numbers/PCG32#C
 const uint64_t N = 6364136223846793005;
 
 static uint64_t state = 0x853c49e6748fea9b;
@@ -39,6 +40,7 @@ void pcg32_seed(uint64_t seed_state, uint64_t seed_sequence)
   pcg32_int();
 }
 
+// https://en.wikipedia.org/wiki/Marsaglia_polar_method#C++
 double gaussian(double mean, double stdDev)
 {
   static double spare;

@@ -1,0 +1,25 @@
+{
+  "name": "Adafruit SHT31 Temperature & Humidity Sensor",
+  "author": "Артём Бобков & Derek Chafin",
+  "pins": ["VCC", "GND", "SCL", "SDA", "ADDR", "RST", "ALRT"],
+  "controls": [
+    {
+      "id": "temperature",
+      "label": "Temperature (°C)",
+      "type": "range",
+      "min": -45,
+      "max": 135,
+      "step": 0.1,
+      "value": 24
+    },
+    {
+      "id": "humidity",
+      "label": "Humidity (%)",
+      "type": "range",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "value": 60
+    }
+  ]
+}

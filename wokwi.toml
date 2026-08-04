@@ -1,0 +1,11 @@
+# Wokwi Configuration File
+# Reference: https://docs.wokwi.com/vscode/project-config
+[wokwi]
+version = 1
+firmware = ".pio/build/adafruit_sht31/firmware.factory.bin"
+elf = ".pio/build/adafruit_sht31/firmware.elf"
+diagram = "diagram.json"
+
+[[chip]]
+name = "adafruit-sht31"
+binary = "chips/adafruit-sht31.chip.wasm"

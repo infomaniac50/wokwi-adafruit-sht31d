@@ -122,6 +122,7 @@ static uint8_t sht30_crc8(uint8_t msb, uint8_t lsb)
 #define SHT3X_HUMIDITY_LIMIT_MSK 0xFE00U
 #define SHT3X_TEMPERATURE_LIMIT_MSK 0x01FFU
 
+// Macro versions of the functions below used to validate numbers in static_assert later on.
 #define TEMPERATURE_TO_TICK(temperature) ((uint16_t)(((int32_t)(temperature) * 12271 + 552195000) >> 15))
 
 #define HUMIDITY_TO_TICK(humidity) ((uint16_t)((((int32_t)(humidity) * 21474) >> 15)))
@@ -129,6 +130,36 @@ static uint8_t sht30_crc8(uint8_t msb, uint8_t lsb)
 #define ALERT_THRESHOLD_WORD(humidity, temperature)                                                                                                                                \
   ((HUMIDITY_TO_TICK(humidity) & SHT3X_HUMIDITY_LIMIT_MSK) | ((TEMPERATURE_TO_TICK(temperature) >> 7) & SHT3X_TEMPERATURE_LIMIT_MSK))
 
+/*
+ * Copyright (c) 2018, Sensirion AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of Sensirion AG nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 // See Also: https://github.com/Sensirion/embedded-sht/blob/94967774f25985bf65356bad3689fec4e8fef2b8/sht3x/sht3x.c#L256
 static inline void tick_to_temperature(uint16_t tick, int32_t *temperature)
 {
@@ -301,7 +332,8 @@ static void run_measurement(chip_state_t *chip)
   float humidity = clamp_float(attr_read_float(chip->humidity_attr), 0.0f, 100.0f);
 
   // TODO: Add response lag
-  // Response time5  τ63% 86 s
+  // Temperature Sensor Response time   τ63% >2 seconds
+  // Humidity Sensor Response time  τ63% 8 seconds
   // With activated ART function (see section 4.7) the response time can be improved by a factor of 2.
   // chip->internal_temperature += alpha * (environment_temperature - chip->internal_temperature);
 
@@ -326,6 +358,15 @@ static void periodic_data_acquisition_timer_callback(void *user_data)
 
   run_measurement(chip);
 
+  /*
+    Activation and Deactivation of the Alert Mode
+
+    Whenever the sensor operates in periodic data acquisiton
+    mode the alert mode is active. It is possible to deactivate the
+    limit for temperature and humidity individually, by setting the
+    Minimum set point to values higher than the Maximum set
+    point (LowSet>HighSet for deactivation of the alert mode).
+  */
   // TODO: Set alert pins
 }
 
